@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Apply License</title>
+
+<style>
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg,#020617,#0f172a,#020617);
+    color:white;
+    overflow:hidden;
+}
+
+/* FULL SCREEN CENTER */
+.container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+/* GLASS CARD */
+.card{
+    width:80%;
+    max-width:1000px;
+    padding:40px;
+    border-radius:20px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 40px rgba(34,197,94,0.2);
+    animation: slideUp 1s ease;
+}
+
+/* ANIMATION */
+@keyframes slideUp{
+    from{ transform: translateY(80px); opacity:0; }
+    to{ transform: translateY(0); opacity:1; }
+}
+
+/* GRID FORM */
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+/* INPUT STYLE */
+input, select{
+    width:100%;
+    padding:14px;
+    border-radius:8px;
+    border:none;
+    outline:none;
+    background:#111827;
+    color:white;
+    font-size:15px;
+    transition:0.3s;
+}
+
+input:focus, select:focus{
+    box-shadow:0 0 10px #22c55e;
+    transform: scale(1.02);
+}
+
+/* FILE INPUT */
+.file-box{
+    grid-column: span 2;
+}
+
+/* BUTTON */
+button{
+    grid-column: span 2;
+    padding:15px;
+    background:#22c55e;
+    border:none;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#4ade80;
+    transform: scale(1.05);
+}
+
+/* TITLE */
+h1{
+    text-align:center;
+    margin-bottom:30px;
+    color:#22c55e;
+    letter-spacing:2px;
+}
+
+/* PROGRESS BAR */
+.progress{
+    height:6px;
+    background:#111;
+    border-radius:5px;
+    margin-bottom:30px;
+    overflow:hidden;
+}
+
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:#22c55e;
+    animation: load 2s forwards;
+}
+
+@keyframes load{
+    from{width:0%;}
+    to{width:70%;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<h1>🚗 Driving License Application</h1>
+
+<div class="progress">
+    <div class="progress-bar"></div>
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+
+<div class="form-grid">
+
+<input type="text" name="fullname" placeholder="Full Name" required>
+<input type="text" name="mothername" placeholder="Mother Name" required>
+
+<input type="number" name="age" placeholder="Age" required>
+
+<select name="vehicle" required>
+    <option value="">Select Vehicle</option>
+    <option>Car</option>
+    <option>Bike</option>
+</select>
+
+<!-- FILES -->
+<div class="file-box">
+    <label>📸 Passport Photo</label>
+    <input type="file" name="passport" required>
+</div>
+
+<div class="file-box">
+    <label>🪪 Aadhaar</label>
+    <input type="file" name="aadhar">
+</div>
+
+<div class="file-box">
+    <label>📄 SSC Memo</label>
+    <input type="file" name="ssc">
+</div>
+
+<button type="submit">🚀 Submit Application</button>
+
+</div>
+</form>
+
+</div>
+</div>
+
+</body>
+</html>

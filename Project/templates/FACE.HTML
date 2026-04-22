@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Face Verification</title>
+
+<style>
+body{
+    margin:0;
+    background:#0f172a;
+    color:white;
+    font-family:sans-serif;
+    text-align:center;
+}
+
+/* CONTAINER */
+.container{
+    margin-top:40px;
+}
+
+/* CAMERA BOX */
+.camera-box{
+    position:relative;
+    width:340px;
+    height:260px;
+    margin:auto;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 0 20px rgba(0,255,150,0.3);
+}
+
+/* VIDEO */
+video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* SCANNING GRADIENT */
+.scan{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:linear-gradient(
+        to bottom,
+        transparent,
+        rgba(0,255,150,0.2),
+        transparent
+    );
+    animation:scanMove 2s linear infinite;
+}
+
+@keyframes scanMove{
+    0%{transform:translateY(-100%);}
+    100%{transform:translateY(100%);}
+}
+
+/* CORNER BOXES */
+.corner{
+    position:absolute;
+    width:40px;
+    height:40px;
+    border:3px solid #00ff9d;
+}
+
+.tl{ top:0; left:0; border-right:none; border-bottom:none; }
+.tr{ top:0; right:0; border-left:none; border-bottom:none; }
+.bl{ bottom:0; left:0; border-right:none; border-top:none; }
+.br{ bottom:0; right:0; border-left:none; border-top:none; }
+
+/* PULSE GLOW */
+.glow{
+    position:absolute;
+    width:100%;
+    height:100%;
+    box-shadow:0 0 20px #00ff9d;
+    animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+    0%{opacity:0.3;}
+    50%{opacity:1;}
+    100%{opacity:0.3;}
+}
+
+/* BUTTON */
+button{
+    margin-top:20px;
+    padding:12px 20px;
+    border:none;
+    background:#00ff9d;
+    color:black;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+/* RESULT */
+#result{
+    margin-top:15px;
+    font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>AI Face Verification</h2>
+
+    <div class="camera-box">
+
+        <video id="video" autoplay></video>
+
+        <!-- REAL SCAN -->
+        <div class="scan"></div>
+
+        <!-- CORNERS -->
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+
+        <!-- GLOW -->
+        <div class="glow"></div>
+
+    </div>
+
+    <button onclick="capture()">Verify Face</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+let video = document.getElementById("video");
+
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream=>{
+    video.srcObject = stream;
+});
+
+function capture(){
+    fetch('/verify_face',{method:'POST'})
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById("result").innerText = data.msg;
+
+        if(data.msg.includes("Verified")){
+            setTimeout(()=>{
+                window.location='/slot';
+            },2000);
+        }
+    });
+}
+</script>
+
+</body>
+</html>

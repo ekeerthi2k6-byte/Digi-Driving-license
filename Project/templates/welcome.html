@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Driving License System</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    background:#020617;
+    overflow:hidden;
+    font-family:sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* BACKGROUND GLOW */
+.glow{
+    position:absolute;
+    width:500px;
+    height:500px;
+    background:radial-gradient(circle,#22c55e,transparent);
+    filter:blur(120px);
+    animation:move 6s infinite alternate;
+}
+
+@keyframes move{
+    0%{transform:translate(-200px,-100px);}
+    100%{transform:translate(200px,100px);}
+}
+
+/* PARTICLES */
+.particle{
+    position:absolute;
+    width:4px;
+    height:4px;
+    background:#22c55e;
+    border-radius:50%;
+    opacity:0.5;
+    animation:float 8s infinite;
+}
+
+@keyframes float{
+    0%{transform:translateY(0);}
+    100%{transform:translateY(-800px);}
+}
+
+/* MAIN BOX */
+.container{
+    position:relative;
+    text-align:center;
+    padding:60px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(20px);
+    box-shadow:0 0 60px rgba(0,255,150,0.2);
+    animation:fadeIn 1.5s ease;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(30px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+/* LOGO */
+.logo{
+    font-size:50px;
+    font-weight:bold;
+    color:#22c55e;
+    letter-spacing:2px;
+    margin-bottom:10px;
+    animation:glowText 2s infinite alternate;
+}
+
+@keyframes glowText{
+    from{text-shadow:0 0 10px #22c55e;}
+    to{text-shadow:0 0 30px #22c55e;}
+}
+
+/* TITLE */
+.title{
+    font-size:26px;
+    color:white;
+    margin-bottom:10px;
+}
+
+/* SUBTITLE */
+.sub{
+    color:#aaa;
+    margin-bottom:30px;
+}
+
+/* BUTTON */
+button{
+    padding:12px 30px;
+    border:none;
+    border-radius:30px;
+    background:#22c55e;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 25px #22c55e;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="glow"></div>
+
+<!-- PARTICLES -->
+<script>
+for(let i=0;i<40;i++){
+    let p=document.createElement("div");
+    p.className="particle";
+    p.style.left=Math.random()*100+"%";
+    p.style.top=Math.random()*100+"%";
+    p.style.animationDuration=(5+Math.random()*5)+"s";
+    document.body.appendChild(p);
+}
+</script>
+
+<div class="container">
+
+    <div class="logo">AI DL</div>
+
+    <div class="title">AI Driving License System</div>
+
+    <div class="sub">Smart • Transparent • Future Ready</div>
+
+    <button onclick="go()">Start</button>
+
+</div>
+
+<script>
+function go(){
+    window.location.href="/login";
+}
+</script>
+
+</body>
+</html>

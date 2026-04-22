@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Face Verification</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#020617,#0f172a);
+    font-family:sans-serif;
+    color:white;
+}
+
+/* CARD */
+.card{
+    width:520px;
+    padding:30px;
+    border-radius:20px;
+    background:#020617;
+    box-shadow:0 0 50px rgba(34,197,94,0.4);
+    text-align:center;
+    animation:fadeIn 1s ease;
+}
+
+/* ANIMATION */
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(30px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+/* VIDEO */
+.video-box{
+    position:relative;
+    border-radius:12px;
+    overflow:hidden;
+    border:3px solid #22c55e;
+}
+
+video{
+    width:100%;
+}
+
+/* SCAN LINE EFFECT */
+.scan{
+    position:absolute;
+    width:100%;
+    height:3px;
+    background:#22c55e;
+    animation:scanMove 2s infinite;
+}
+
+@keyframes scanMove{
+    0%{top:0;}
+    100%{top:100%;}
+}
+
+/* BUTTON */
+button{
+    margin-top:15px;
+    padding:12px 20px;
+    border:none;
+    border-radius:8px;
+    background:#22c55e;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#4ade80;
+    transform:scale(1.05);
+}
+
+/* STATUS */
+#status{
+    margin-top:15px;
+    font-weight:bold;
+    font-size:16px;
+    transition:0.3s;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>🔍 AI Face Verification</h2>
+
+    <!-- Passport Upload -->
+    <input type="file" id="passport">
+    <br>
+    <button onclick="uploadPassport()">Upload Passport</button>
+
+    <br><br>
+
+    <!-- Camera -->
+    <div class="video-box">
+        <video id="video" autoplay></video>
+        <div class="scan"></div>
+    </div>
+
+    <button onclick="verifyFace()">Verify Face</button>
+
+    <div id="status"></div>
+
+</div>
+
+<script>
+const video = document.getElementById("video");
+
+// Start camera
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => video.srcObject = stream);
+
+// Upload passport
+function uploadPassport(){
+    let file = document.getElementById("passport").files[0];
+
+    if(!file){
+        alert("Select a file first");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/upload_passport",{
+        method:"POST",
+        body:formData
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById("status").innerText = data.status;
+    });
+}
+
+// Verify face
+function verifyFace(){
+    const canvas = document.createElement("canvas");
+
+    // HIGH QUALITY
+    canvas.width = 640;
+    canvas.height = 480;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, 640, 480);
+
+    const image = canvas.toDataURL("image/jpeg");
+
+    document.getElementById("status").innerText = "⏳ Verifying...";
+
+    fetch("/verify_face",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({image:image})
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById("status").innerText =
+            data.status + " " + (data.confidence || "");
+
+        // Redirect if matched
+        if(data.status.includes("✅")){
+            setTimeout(()=>{
+                window.location = "/slot";
+            },1500);
+        }
+    })
+    .catch(()=>{
+        document.getElementById("status").innerText = "❌ Camera error";
+    });
+}
+</script>
+
+</body>
+</html>

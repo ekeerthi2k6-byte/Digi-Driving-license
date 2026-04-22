@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{
+    margin:0;
+    background:black;
+    color:white;
+    overflow:hidden;
+}
+
+h1{
+    text-align:center;
+    margin-top:200px;
+}
+
+.car{
+    position:absolute;
+    bottom:50px;
+    left:-200px;
+    font-size:50px;
+    animation:move 3s linear forwards;
+}
+
+@keyframes move{
+    to{ left:100%; }
+}
+</style>
+
+<script>
+setTimeout(()=>window.location="/login",3000);
+</script>
+</head>
+
+<body>
+<h1>🚗 Driving License System</h1>
+<div class="car">🚗</div>
+</body>
+</html>

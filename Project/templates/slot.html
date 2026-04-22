@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Slot Booking</title>
+
+<style>
+body{
+    margin:0;
+    font-family:sans-serif;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+}
+
+/* HEADER */
+h2{
+    margin-top:20px;
+}
+
+/* DATE PICKER */
+input[type="date"]{
+    padding:10px;
+    border-radius:5px;
+    border:none;
+    margin-top:20px;
+}
+
+/* SLOT GRID */
+.slots{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    max-width:500px;
+    margin:30px auto;
+}
+
+/* SLOT */
+.slot{
+    padding:15px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s;
+    background:#1e293b;
+}
+
+/* AVAILABLE */
+.available:hover{
+    background:#22c55e;
+    transform:scale(1.1);
+}
+
+/* SELECTED */
+.selected{
+    background:#22c55e !important;
+    border:2px solid white;
+}
+
+/* BOOKED */
+.booked{
+    background:#ef4444;
+    cursor:not-allowed;
+    opacity:0.6;
+}
+
+/* BUTTON */
+button{
+    padding:12px 20px;
+    background:#3b82f6;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+/* FADE ANIMATION */
+.fade{
+    animation:fade 0.5s ease;
+}
+
+@keyframes fade{
+    from{opacity:0;}
+    to{opacity:1;}
+}
+</style>
+</head>
+
+<body>
+
+<h2>📅 Select Date & Slot</h2>
+
+<input type="date" id="datePicker" onchange="loadSlots()">
+
+<div class="slots" id="slots"></div>
+
+<button onclick="book()">Confirm Slot</button>
+
+<script>
+let selectedSlot = null;
+
+/* LOAD SLOTS BASED ON DATE */
+function loadSlots(){
+    let date = document.getElementById("datePicker").value;
+
+    if(!date){
+        return;
+    }
+
+    let container = document.getElementById("slots");
+    container.innerHTML = ""; // clear old
+
+    selectedSlot = null;
+
+    container.classList.add("fade");
+
+    for(let i=9;i<=17;i++){
+        let div = document.createElement("div");
+
+        let isBooked = Math.random() < 0.3;
+
+        div.innerText = i + ":00";
+
+        if(isBooked){
+            div.classList.add("slot","booked");
+        }else{
+            div.classList.add("slot","available");
+
+            div.onclick = () => {
+                document.querySelectorAll('.slot').forEach(s=>s.classList.remove('selected'));
+                div.classList.add("selected");
+                selectedSlot = div.innerText;
+            };
+        }
+
+        container.appendChild(div);
+    }
+}
+
+/* BOOK */
+function book(){
+    let date = document.getElementById("datePicker").value;
+
+    if(!date){
+        alert("Select a date first ❌");
+        return;
+    }
+
+    if(!selectedSlot){
+        alert("Select a slot ❌");
+        return;
+    }
+
+    alert("✅ Booked on " + date + " at " + selectedSlot);
+
+    window.location='/theory';
+}
+</script>
+
+</body>
+</html>

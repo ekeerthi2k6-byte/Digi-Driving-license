@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#667eea,#764ba2);
+    overflow:hidden;
+    font-family:sans-serif;
+}
+
+/* floating circles */
+.circle{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.1);
+    animation:float 6s infinite ease-in-out;
+}
+.circle:nth-child(1){ width:200px; height:200px; top:10%; left:10%; }
+.circle:nth-child(2){ width:150px; height:150px; bottom:10%; right:10%; }
+
+@keyframes float{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-30px); }
+}
+
+/* glass box */
+.box{
+    backdrop-filter:blur(15px);
+    background:rgba(255,255,255,0.1);
+    padding:40px;
+    border-radius:15px;
+    text-align:center;
+    color:white;
+    width:300px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    border-radius:8px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#00c6ff;
+    color:white;
+    cursor:pointer;
+}
+
+a{
+    color:#fff;
+    display:block;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="circle"></div>
+<div class="circle"></div>
+
+<div class="box">
+    <h2>Login</h2>
+
+    <form method="POST">
+        <input name="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password" required>
+        <button>Login</button>
+    </form>
+
+    <a href="/google-login">
+    <button style="
+        background:#4285F4;
+        color:white;
+        padding:10px 20px;
+        border:none;
+        border-radius:5px;
+        cursor:pointer;
+        margin-top:10px;
+    ">
+        🔵 Login with Google
+    </button>
+</a>
+</a>
+</div>
+
+</body>
+</html>

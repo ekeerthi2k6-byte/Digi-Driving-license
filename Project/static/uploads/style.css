@@ -1,0 +1,209 @@
+/* RESET */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+/* BODY BACKGROUND */
+body{
+background: linear-gradient(135deg,#4facfe,#00f2fe);
+min-height:100vh;
+}
+
+/* NAVBAR */
+.navbar{
+display:flex;
+justify-content:center;
+align-items:center;
+background:#111;
+padding:15px;
+position:sticky;
+top:0;
+z-index:1000;
+}
+
+.navbar a{
+color:white;
+margin:0 15px;
+text-decoration:none;
+font-weight:bold;
+transition:0.3s;
+}
+
+.navbar a:hover{
+color:#00f2fe;
+}
+
+/* CONTAINER */
+.container{
+width:90%;
+max-width:420px;
+margin:60px auto;
+background:white;
+padding:25px;
+border-radius:15px;
+box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* INPUTS */
+input, select, button{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:14px;
+}
+
+/* BUTTON */
+button{
+background:#4facfe;
+color:white;
+border:none;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#007bff;
+transform:scale(1.02);
+}
+
+/* LABELS */
+label{
+font-weight:bold;
+font-size:14px;
+}
+
+/* DASHBOARD GRID */
+.dashboard{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+margin-top:20px;
+}
+
+/* DASHBOARD CARDS */
+.card{
+padding:20px;
+background:white;
+border-radius:12px;
+text-align:center;
+cursor:pointer;
+transition:0.3s;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card:hover{
+transform:scale(1.05);
+background:#f0f8ff;
+}
+
+/* VIDEO (FACE VERIFY) */
+video{
+width:100%;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+/* SIMULATOR CANVAS */
+canvas{
+display:block;
+margin:20px auto;
+background:#333;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,0.5);
+}
+
+/* LOADER */
+.loader{
+display:none;
+text-align:center;
+margin-top:20px;
+}
+
+.spinner{
+border:5px solid #ccc;
+border-top:5px solid #4facfe;
+border-radius:50%;
+width:50px;
+height:50px;
+margin:auto;
+animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+0%{transform:rotate(0);}
+100%{transform:rotate(360deg);}
+}
+
+/* SUCCESS / ERROR TEXT */
+.success{
+color:green;
+text-align:center;
+font-weight:bold;
+}
+
+.error{
+color:red;
+text-align:center;
+font-weight:bold;
+}
+
+/* SLOT BUTTONS */
+.slot-btn{
+margin:5px;
+padding:10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#4facfe;
+color:white;
+}
+
+.slot-btn:disabled{
+background:gray;
+cursor:not-allowed;
+}
+
+/* HERO (WELCOME PAGE SUPPORT) */
+.hero{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#000428,#004e92);
+color:white;
+text-align:center;
+}
+
+.hero h1{
+font-size:48px;
+margin-bottom:10px;
+}
+
+.hero p{
+font-size:20px;
+opacity:0.8;
+}
+
+.car{
+font-size:80px;
+margin-bottom:20px;
+animation:move 2s infinite alternate;
+}
+
+@keyframes move{
+from{transform:translateX(-20px);}
+to{transform:translateX(20px);}
+}
+
+/* RESPONSIVE */
+@media(max-width:500px){
+.container{
+width:95%;
+}
+}

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+
+<style>
+body{
+    margin:0;
+    font-family:sans-serif;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    color:white;
+}
+
+/* NAVBAR */
+.navbar{
+    background:black;
+    padding:15px;
+    text-align:center;
+}
+
+.navbar a{
+    color:white;
+    margin:15px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+/* GRID */
+.container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+    padding:40px;
+}
+
+/* CARD */
+.card{
+    background:white;
+    color:black;
+    padding:30px;
+    border-radius:10px;
+    text-align:center;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:scale(1.05);
+    background:#22c55e;
+    color:white;
+}
+
+/* CHAT BUTTON */
+#chatBtn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#22c55e;
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    font-size:24px;
+    box-shadow:0 0 15px #22c55e;
+}
+
+/* CHAT BOX */
+#chatBox{
+    position:fixed;
+    bottom:90px;
+    right:20px;
+    width:320px;
+    height:420px;
+    background:#111;
+    border-radius:15px;
+    display:none;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 0 20px rgba(0,255,150,0.3);
+}
+
+/* HEADER */
+#chatHeader{
+    background:#22c55e;
+    padding:12px;
+    text-align:center;
+    font-weight:bold;
+}
+
+/* MESSAGES */
+#chatMessages{
+    flex:1;
+    padding:10px;
+    overflow-y:auto;
+    font-size:14px;
+}
+
+/* INPUT */
+#chatInput{
+    border:none;
+    padding:12px;
+    outline:none;
+    width:100%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/application">Application</a>
+    <a href="/slot">Slot</a>
+    <a href="/theory">Theory</a>
+    <a href="/simulator">Simulator</a>
+    <a href="/result">Result</a>
+</div>
+
+<div class="container">
+    <div class="card" onclick="go('/application')">📝 Application</div>
+    <div class="card" onclick="go('/face')">👤 Face Verification</div>
+    <div class="card" onclick="go('/slot')">🎟️ Slot Booking</div>
+    <div class="card" onclick="go('/theory')">🧠 Theory Test</div>
+    <div class="card" onclick="go('/simulator')">🎮 Simulator</div>
+    <div class="card" onclick="go('/result')">📊 Result</div>
+</div>
+
+<!-- CHAT -->
+<div id="chatBtn" onclick="toggleChat()">💬</div>
+
+<div id="chatBox">
+    <div id="chatHeader">AI Assistant 🤖</div>
+    <div id="chatMessages"></div>
+    <input id="chatInput" placeholder="Ask anything..." onkeydown="send(event)">
+</div>
+<div class="user-box">
+    <span>👤 {{ session["user"] }}</span>
+    <button onclick="logout()">Logout</button>
+    <button onclick="switchAccount()">Switch</button>
+</div>
+<style>
+.user-box{
+    position:absolute;
+    top:20px;
+    right:20px;
+    background:rgba(0,0,0,0.6);
+    padding:10px 15px;
+    border-radius:20px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    backdrop-filter: blur(10px);
+}
+
+.user-box button{
+    border:none;
+    padding:6px 10px;
+    border-radius:10px;
+    cursor:pointer;
+    background:#22c55e;
+    color:black;
+    transition:0.3s;
+}
+
+.user-box button:hover{
+    transform:scale(1.1);
+    background:#16a34a;
+}
+</style>
+
+<script>
+
+function go(url){
+    window.location = url;
+}
+
+/* CHAT OPEN */
+function toggleChat(){
+    let box = document.getElementById("chatBox");
+    box.style.display = (box.style.display === "flex") ? "none" : "flex";
+}
+
+/* SEND */
+function send(e){
+    if(e.key === "Enter"){
+
+        let input = document.getElementById("chatInput");
+        let msg = input.value.trim();
+
+        if(msg === "") return;
+
+        addMessage("You: " + msg);
+
+        fetch("/chat", {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({message: msg})
+        })
+        .then(res => res.json())
+        .then(data => {
+            addMessage("AI: " + data.reply);
+        })
+        .catch(()=>{
+            addMessage("AI: Server error");
+        });
+
+        input.value="";
+    }
+}
+
+/* TYPING EFFECT */
+function addMessage(text){
+
+    let div = document.createElement("div");
+    document.getElementById("chatMessages").appendChild(div);
+
+    let i = 0;
+
+    function type(){
+        if(i < text.length){
+            div.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type,15);
+        }
+    }
+
+    type();
+}
+
+
+</script>
+<script>
+function logout(){
+    animateExit(() => {
+        window.location = "/logout";
+    });
+}
+
+function switchAccount(){
+    animateExit(() => {
+        window.location = "/google-login";
+    });
+}
+
+/* 🔥 SMOOTH EXIT ANIMATION */
+function animateExit(callback){
+    let body = document.body;
+
+    body.style.transition = "0.6s";
+    body.style.opacity = "0";
+    body.style.transform = "scale(0.95)";
+
+    setTimeout(callback, 600);
+}
+</script>
+
+</body>
+</html>

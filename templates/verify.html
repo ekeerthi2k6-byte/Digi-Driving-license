@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Face Verification</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+        }
+
+        input {
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        #uploadBtn {
+            background: #007bff;
+            color: white;
+        }
+
+        #verifyBtn {
+            background: #28a745;
+            color: white;
+        }
+
+        #verifyBtn:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        video {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: black;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Face Verification</h1>
+
+    <p>
+        Upload your passport photo and verify your face using the camera.
+    </p>
+
+    <!-- PASSPORT UPLOAD -->
+
+    <input
+        type="file"
+        id="passport"
+        accept="image/*"
+    >
+
+    <br>
+
+    <button
+        id="uploadBtn"
+        onclick="uploadPassport()"
+    >
+        Upload Passport
+    </button>
+
+    <p id="uploadStatus"></p>
+
+
+    <!-- CAMERA -->
+
+    <video
+        id="video"
+        autoplay
+        playsinline
+        muted
+    ></video>
+
+    <br>
+
+    <button
+        id="verifyBtn"
+        onclick="verifyFace()"
+        disabled
+    >
+        Verify Face
+    </button>
+
+    <p id="status"></p>
+
+</div>
+
+
+<script>
+
+let cameraStream = null;
+let passportUploaded = false;
+let verifying = false;
+
+
+// =====================================================
+// UPLOAD PASSPORT
+// =====================================================
+
+async function uploadPassport() {
+
+    const fileInput =
+        document.getElementById("passport");
+
+    const status =
+        document.getElementById("uploadStatus");
+
+    const verifyBtn =
+        document.getElementById("verifyBtn");
+
+    if (!fileInput.files.length) {
+
+        status.innerText =
+            "❌ Please select a passport image.";
+
+        return;
+    }
+
+    const formData = new FormData();
+
+    formData.append(
+        "file",
+        fileInput.files[0]
+    );
+
+    status.innerText =
+        "Uploading passport...";
+
+    try {
+
+        const response = await fetch(
+            "/upload_passport",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Server returned " +
+                response.status
+            );
+        }
+
+        const result =
+            await response.json();
+
+        status.innerText =
+            result.status;
+
+        if (
+            result.status &&
+            result.status.includes("uploaded")
+        ) {
+
+            passportUploaded = true;
+
+            verifyBtn.disabled = false;
+
+            startCamera();
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Upload error:",
+            error
+        );
+
+        status.innerText =
+            "❌ Passport upload failed: " +
+            error.message;
+    }
+}
+
+
+// =====================================================
+// START CAMERA
+// =====================================================
+
+async function startCamera() {
+
+    const video =
+        document.getElementById("video");
+
+    try {
+
+        if (!navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia) {
+
+            throw new Error(
+                "Camera API is not available. Open the app using http://127.0.0.1:5000/"
+            );
+        }
+
+        cameraStream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video: {
+                    facingMode: "user",
+                    width: {
+                        ideal: 640
+                    },
+                    height: {
+                        ideal: 480
+                    }
+                },
+
+                audio: false
+            });
+
+        video.srcObject =
+            cameraStream;
+
+        await video.play();
+
+        console.log(
+            "Camera started successfully"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+        document.getElementById(
+            "status"
+        ).innerText =
+            "❌ Camera error: " +
+            error.message;
+    }
+}
+
+
+// =====================================================
+// VERIFY FACE
+// =====================================================
+
+async function verifyFace() {
+
+    if (verifying) {
+        return;
+    }
+
+    if (!passportUploaded) {
+
+        document.getElementById(
+            "status"
+        ).innerText =
+            "❌ Upload passport first.";
+
+        return;
+    }
+
+    const video =
+        document.getElementById("video");
+
+    const status =
+        document.getElementById("status");
+
+    const verifyBtn =
+        document.getElementById("verifyBtn");
+
+    // -------------------------------------------------
+    // CHECK CAMERA
+    // -------------------------------------------------
+
+    if (!video.videoWidth ||
+        !video.videoHeight) {
+
+        status.innerText =
+            "❌ Camera is not ready. Please wait.";
+
+        return;
+    }
+
+    verifying = true;
+
+    verifyBtn.disabled = true;
+
+    status.innerText =
+        "⏳ Verifying face...";
+
+    try {
+
+        // -------------------------------------------------
+        // CREATE CANVAS
+        // -------------------------------------------------
+
+        const canvas =
+            document.createElement("canvas");
+
+        canvas.width =
+            video.videoWidth;
+
+        canvas.height =
+            video.videoHeight;
+
+        const context =
+            canvas.getContext("2d");
+
+        context.drawImage(
+            video,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        // -------------------------------------------------
+        // CONVERT IMAGE
+        // -------------------------------------------------
+
+        const imageData =
+            canvas.toDataURL(
+                "image/jpeg",
+                0.85
+            );
+
+        console.log(
+            "Camera image captured"
+        );
+
+        // -------------------------------------------------
+        // SEND TO FLASK
+        // -------------------------------------------------
+
+        const response =
+            await fetch(
+                "/verify_face",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        image: imageData
+                    })
+                }
+            );
+
+        console.log(
+            "Server response:",
+            response.status
+        );
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            console.error(
+                "Server error:",
+                errorText
+            );
+
+            throw new Error(
+                "Server returned HTTP " +
+                response.status
+            );
+        }
+
+        const result =
+            await response.json();
+
+        console.log(
+            "Verification result:",
+            result
+        );
+
+        // -------------------------------------------------
+        // DISPLAY RESULT
+        // -------------------------------------------------
+
+        if (
+            result.status &&
+            result.status.includes(
+                "Face Matched"
+            )
+        ) {
+
+            status.innerText =
+                result.status +
+                " " +
+                (result.confidence || "");
+
+            setTimeout(
+                function () {
+
+                    window.location.href =
+                        "/face_done";
+
+                },
+                1000
+            );
+
+        } else {
+
+            status.innerText =
+                result.status +
+                (
+                    result.confidence
+                    ? " " +
+                      result.confidence
+                    : ""
+                );
+
+            verifyBtn.disabled = false;
+
+            verifying = false;
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Verification error:",
+            error
+        );
+
+        status.innerText =
+            "❌ Verification error: " +
+            error.message;
+
+        verifyBtn.disabled = false;
+
+        verifying = false;
+    }
+}
+
+</script>
+
+</body>
+
+</html>

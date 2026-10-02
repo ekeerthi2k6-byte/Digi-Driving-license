@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Driving Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            background: #0f172a;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* LEFT PANEL: GAME AREA */
+        #left {
+            flex: 2;
+            text-align: center;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* RIGHT PANEL: ANALYSIS */
+        #right {
+            flex: 1;
+            padding: 20px;
+            background: #020617;
+            border-left: 2px solid #22c55e;
+            overflow-y: auto;
+        }
+
+        canvas {
+            background: #1e293b;
+            border: 3px solid #22c55e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+        }
+
+        .comment {
+            margin: 10px 0;
+            padding: 12px;
+            background: #111;
+            border-left: 4px solid #22c55e;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .bad { border-left: 4px solid #ef4444; }
+
+        #speedMeter {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #22c55e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #020617;
+        }
+
+        #needle {
+            width: 2px;
+            height: 45px;
+            background: #ef4444;
+            position: absolute;
+            bottom: 50%;
+            transform-origin: bottom;
+            transition: transform 0.1s linear;
+        }
+
+        button {
+            margin: 10px;
+            padding: 12px 25px;
+            background: #22c55e;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #020617;
+            transition: 0.2s;
+        }
+
+        button:hover { background: #4ade80; transform: scale(1.05); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="left">
+    <h2>🚗 AI Driving Simulator</h2>
+    <canvas id="game" width="600" height="400"></canvas>
+
+    <div id="speedMeter">
+        <div id="needle"></div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <button onclick="startTest('good')">Start Good Demo</button>
+        <button onclick="startTest('bad')" style="background:#ef4444; color:white;">Start Bad Demo</button>
+    </div>
+</div>
+
+<div id="right">
+    <h3>📊 AI Real-time Analysis</h3>
+    <div id="comments"></div>
+    <h2 id="finalStatus" style="color: #22c55e; margin-top: 20px;"></h2>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let t = 0;
+let speed = 0;
+let running = false;
+let mode = "good";
+let commentIndex = 0;
+
+const goodComments = [
+    "✔ Smooth Ignition",
+    "✔ Speed Maintained",
+    "✔ Perfect Lane Centering",
+    "✔ Safe Steering",
+    "✔ Test Passed"
+];
+
+const badComments = [
+    "❌ Harsh Start",
+    "❌ Speed Limit Exceeded",
+    "❌ Lane Departure",
+    "❌ Unsafe Driving",
+    "❌ Test Failed"
+];
+
+function speak(text){
+    const msg = new SpeechSynthesisUtterance(text);
+    speechSynthesis.speak(msg);
+}
+
+function addComment(text, isBad=false){
+    const div = document.createElement("div");
+    div.className = isBad ? "comment bad" : "comment";
+    div.innerText = text;
+    document.getElementById("comments").prepend(div);
+}
+
+function drawTrack(){
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 40;
+    ctx.beginPath();
+
+    for(let i=0;i<Math.PI*2;i+=0.01){
+        let x = 300 + 150*Math.sin(i);
+        let y = 200 + 100*Math.sin(i)*Math.cos(i);
+        ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+}
+
+function getPosition(time){
+    let x = 300 + 150*Math.sin(time);
+    let y = 200 + 100*Math.sin(time)*Math.cos(time);
+
+    if(mode === "bad"){
+        if(time > 3){
+            x += 40;
+            y += 20;
+        }
+    }
+    return {x,y};
+}
+
+function loop(){
+    if(!running) return;
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawTrack();
+
+    if(speed < 1.5) speed += 0.005;
+    t += 0.01 * speed;
+
+    const pos = getPosition(t);
+
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 10, 0, Math.PI*2);
+    ctx.fill();
+
+    document.getElementById("needle").style.transform =
+        `rotate(${speed*80}deg)`;
+
+    if(Math.floor(t*2) > commentIndex && commentIndex < 5){
+        addComment(
+            mode==="good" ? goodComments[commentIndex] : badComments[commentIndex],
+            mode==="bad"
+        );
+        commentIndex++;
+    }
+
+    // ✅ END TEST
+    if(t > 6.3){
+        running = false;
+
+        document.getElementById("finalStatus").innerText = "Analyzing Results...";
+
+        fetch("/set_mode", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ mode: mode })
+        })
+        .then(() => {
+            setTimeout(() => {
+                window.location.href = "/result";
+            }, 2000);
+        });
+
+        return;
+    }
+
+    requestAnimationFrame(loop);
+}
+
+function startTest(m){
+    running = true;
+    t = 0;
+    speed = 0;
+    commentIndex = 0;
+    mode = m;
+
+    document.getElementById("comments").innerHTML = "";
+    document.getElementById("finalStatus").innerText = "";
+
+    speak("Starting simulation");
+    loop();
+}
+</script>
+
+</body>
+</html>

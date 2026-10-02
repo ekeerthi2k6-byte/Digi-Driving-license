@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Theory Test</title>
+<style>
+    body{ background:#0f172a; color:white; font-family:sans-serif; padding:20px; }
+    .container{ max-width:750px; margin:auto; }
+    h2{ text-align:center; margin-bottom:20px; }
+    .question{ background:#1e293b; padding:15px; margin:15px 0; border-radius:10px; transition:0.3s; animation:fadeIn 0.5s ease; }
+    .question:hover{ transform:scale(1.02); box-shadow:0 0 10px #22c55e; }
+    .option{ display:block; padding:8px; margin:6px 0; border-radius:5px; cursor:pointer; transition:0.3s; }
+    .option input{ display:none; }
+    .option span{ display:block; padding:8px; border-radius:5px; border: 1px solid #334155; }
+    .option input:checked + span{ background:#22c55e; color:black; font-weight:bold; box-shadow:0 0 10px #22c55e; border-color: #22c55e; }
+    button{ padding:12px 20px; background:#22c55e; border:none; border-radius:6px; cursor:pointer; width:100%; margin-top:20px; font-size:16px; font-weight: bold; color: #020617; }
+    button:hover{ background: #4ade80; }
+    @keyframes fadeIn{ from{ opacity:0; transform:translateY(20px); } to{ opacity:1; transform:translateY(0); } }
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h2>🧠 Theory Test (10 Questions)</h2>
+
+    <form id="theoryForm">
+        {% for q in questions %}
+        <div class="question">
+            <p><b>{{ loop.index }}. {{ q.q }}</b></p>
+            {% set q_index = loop.index0 %}
+            {% for opt in q.options %}
+            <label class="option">
+                <input type="radio" name="q{{ q_index }}" value="{{ opt }}" required>
+                <span>{{ opt }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <button type="button" onclick="submitTest()">Submit Test & Start Simulator</button>
+    </form>
+</div>
+
+<script>
+function submitTest() {
+    // Basic validation: Check if at least one question is answered
+    const form = document.getElementById('theoryForm');
+    const formData = new FormData(form);
+    
+    // 🔥 We trigger the backend route to set session["theory_completed"] = True
+    fetch("/submit_theory", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success" || data.status === "ok") {
+            // ✅ NOW the session is set, so the simulator route will allow us in
+            window.location.href = "/simulator";
+        } else {
+            alert("Error saving progress. Try again!");
+        }
+    })
+    .catch(err => {
+        console.error("Fetch error:", err);
+        alert("Server connection failed.");
+    });
+}
+</script>
+
+</body>
+</html>

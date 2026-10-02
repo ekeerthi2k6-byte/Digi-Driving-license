@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#0f2027;
+    font-family:sans-serif;
+}
+
+/* container */
+.container{
+    width:600px;
+    height:350px;
+    display:flex;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+/* left animation */
+.left{
+    width:50%;
+    background:linear-gradient(135deg,#00c6ff,#0072ff);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    animation:slide 2s ease;
+}
+
+@keyframes slide{
+    from{ transform:translateX(-100%); }
+    to{ transform:translateX(0); }
+}
+
+/* right form */
+.right{
+    width:50%;
+    padding:30px;
+    text-align:center;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#0072ff;
+    color:white;
+    border:none;
+}
+
+a{
+    display:block;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="left">
+        🚗 Join Us
+    </div>
+
+    <div class="right">
+        <h2>Register</h2>
+
+        <form method="POST">
+            <input name="email" placeholder="Email" required>
+            <input name="password" type="password" placeholder="Password" required>
+            <button>Register</button>
+        </form>
+
+        <a href="/login">Back to Login</a>
+    </div>
+
+</div>
+
+</body>
+</html>
